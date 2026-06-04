@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НМТ Фізика — Великий JSON Тренажер</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #1a2a3a;
+            --accent: #c5a059;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .category-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .cat-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.2s, background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .cat-btn:active {
+            transform: scale(0.98);
+        }
+
+        .cat-btn span {
+            font-size: 12px;
+            background: var(--accent);
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: none;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            width: 100%;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn.correct {
+            background-color: #e8f5e9;
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .option-btn.wrong {
+            background-color: #ffebee;
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .explanation-box {
+            background-color: #fef9e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .explanation-box h4 {
+            color: #b7950b;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .next-btn {
+            background-color: var(--accent);
+            color: var(--primary);
+            font-weight: bold;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            display: none;
+        }
+
+        .results-screen {
+            text-align: center;
+            display: none;
+        }
+
+        .results-screen h2 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0 auto 20px auto;
+            border: 4px solid var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <h1>ПРО-Тренажер Фізика НМТ</h1>
+        <p>Глобальна база на 250 каверзних питань (JSON Engine)</p>
+    </header>
+
+    <div class="category-menu" id="menu">
+        <button class="cat-btn" onclick="startQuiz('mechanics')">1. Механіка (Кінематика, Динаміка, Гідро) <span>50 пит.</span></button>
+        <button class="cat-btn" onclick="startQuiz('thermo')">2. Молекулярна фізика та Термодинаміка <span>50 пит.</span></button>
+        <button class="cat-btn" onclick="startQuiz('electro')">3. Електродинаміка та Постійний струм <span>50 пит.</span></button>
+        <button class="cat-btn" onclick="startQuiz('waves')">4. Коливання, Хвилі та Оптика <span>50 пит.</span></button>
+        <button class="cat-btn" onclick="startQuiz('quantum')">5. Квантова, Атомна та Ядерна фізика <span>50 пит.</span></button>
+    </div>
+
+    <div class="quiz-container" id="quiz">
+        <button class="back-btn" onclick="goBack()">← До категорій</button>
+        <div class="progress-container">
+            <span id="counter-text">Завантаження питань...</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="question-text" id="q-text">Завантаження тексту...</div>
+        <div class="options-list" id="options"></div>
+        <div class="explanation-box" id="explanation">
+            <h4>Святе пояснення:</h4>
+            <p id="exp-text">...</p>
+        </div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Далі →</button>
+
+        <div class="results-screen" id="results">
+            <h2>Розділ завершено!</h2>
+            <div class="score-circle" id="score-view">0/50</div>
+            <p id="result-comment" style="margin-bottom: 20px; font-weight: 500; padding: 0 10px;"></p>
+            <button class="cat-btn" style="text-align:center; display:block; width:100%;" onclick="goBack()">Повернутись до вибору тем</button>
+        </div>
+    </div>
+
+    <script>
+        let globalDatabase = null;
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+
+        // Асинхронне завантаження класичного JSON
+        async function loadDatabase() {
+            try {
+                const response = await fetch('questions.json');
+                if (!response.ok) throw new Error("Не вдалося завантажити JSON файл");
+                globalDatabase = await response.json();
+            } catch (error) {
+                console.error("Помилка завантаження бази даних:", error);
+                alert("Критична помилка: Не вдалося завантажити файл 'questions.json'. Перевірте його наявність поруч з файлом index.html!");
+            }
+        }
+
+        // Запускаємо завантаження бази одразу при старті сторінки
+        window.onload = loadDatabase;
+
+        function startQuiz(cat) {
+            if (!globalDatabase) {
+                alert("База даних ще завантажується, зачекайте секунду...");
+                return;
+            }
+            if (!globalDatabase[cat] || globalDatabase[cat].length === 0) {
+                alert(`Розділ '${cat}' порожній або ще не доданий у JSON файл!`);
+                return;
+            }
+
+            score = 0;
+            currentIndex = 0;
+            
+            // Парсимо питання з обраної категорії
+            currentQuestions = globalDatabase[cat].map(item => {
+                let options = [item.a, ...item.w];
+                options.sort(() => Math.random() - 0.5); // перемішуємо варіанти А, Б, В, Г
+                return {
+                    q: item.q,
+                    correct: item.a,
+                    options: options,
+                    e: item.e
+                };
+            });
+
+            // Перемішуємо пул питань
+            currentQuestions.sort(() => Math.random() - 0.5);
+
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('main-header').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            document.getElementById('q-text').style.display = 'block';
+            document.getElementById('options').style.display = 'flex';
+            document.getElementById('progress').parentNode.style.display = 'block';
+            document.getElementById('counter-text').style.display = 'inline';
+
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentIndex >= currentQuestions.length) {
+                showResults();
+                return;
+            }
+
+            let total = currentQuestions.length;
+            document.getElementById('counter-text').innerText = `Питання ${currentIndex + 1} з ${total}`;
+            let percent = (currentIndex / total) * 100;
+            document.getElementById('progress').style.width = percent + '%';
+
+            let q = currentQuestions[currentIndex];
+            document.getElementById('q-text').innerText = q.q;
+            
+            let optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            document.getElementById('explanation').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+
+            q.options.forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(btn, opt, q.correct, q.e);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedBtn, selectedOpt, correctOpt, explanationText) {
+            let buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedOpt === correctOpt) {
+                selectedBtn.classList.add('correct');
+                score++;
+            } else {
+                selectedBtn.classList.add('wrong');
+                buttons.forEach(btn => {
+                    if (btn.innerText === correctOpt) btn.classList.add('correct');
+                });
+            }
+
+            document.getElementById('exp-text').innerText = explanationText;
+            document.getElementById('explanation').style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            showQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            document.getElementById('q-text').style.display = 'none';
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('explanation').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('progress').parentNode.style.display = 'none';
+            document.getElementById('counter-text').style.display = 'none';
+            
+            let resScreen = document.getElementById('results');
+            resScreen.style.display = 'block';
+            
+            let total = currentQuestions.length;
+            document.getElementById('score-view').innerText = `${score}/${total}`;
+            
+            let rating = score / total;
+            let comment = '';
+            if(rating === 1.0) comment = "Абсолютний тріумф! Ти випалила цей розділ в нуль. Геній! 👑";
+            else if(rating >= 0.8) comment = "Шикарний результат! Тобі практично нереально підсунути пастку на реальному іспиті. 🚀";
+            else if(rating >= 0.5) comment = "Нормально, але укладачі тестів змогли тебе кілька разів підловити. Прочитай пояснення уважніше. 👍";
+            else comment = "Малувато. Теорія потребує серйозного шліфування. Відкривай конспект і пробіжись по пастках ще раз! 📖";
+            
+            document.getElementById('result-comment').innerText = comment;
+        }
+
+        function goBack() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+            document.getElementById('main-header').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
